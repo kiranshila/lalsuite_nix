@@ -21,7 +21,7 @@
               url = "https://software.igwn.org/lscsoft/source/lalsuite/lal-${version}.tar.xz";
               hash = "sha256-m7aSATxTSIDPPut8jkXCoyvW10588MaRj2OLwVvQz10=";
             };
-            nativeBuildInputs = with pkgs; [autoconf automake pkg-config git];
+            nativeBuildInputs = with pkgs; [autoreconfHook pkg-config lld];
             buildInputs = with pkgs; [
               zlib
               gsl
@@ -29,7 +29,7 @@
               fftwFloat
             ];
             configurePhase = ''
-              ./configure --disable-swig --prefix=$out CFLAGS="-Wno-macro-redefined -flto" LDFLAGS="-flto"
+              ./configure --disable-swig --prefix=$out CFLAGS="-Wno-macro-redefined -flto -fuse-ld=lld" LDFLAGS="-flto -fuse-ld=lld"
             '';
           };
       in {
