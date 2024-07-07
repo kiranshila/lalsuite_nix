@@ -18,13 +18,13 @@
               url = "https://software.igwn.org/lscsoft/source/lalsuite/lal-${version}.tar.xz";
               hash = "sha256-m7aSATxTSIDPPut8jkXCoyvW10588MaRj2OLwVvQz10=";
             };
-            nativeBuildInputs = with pkgs; [autoreconfHook pkg-config lld];
+            nativeBuildInputs = with pkgs; [pkg-config lld];
             buildInputs = with pkgs; [
               zlib
               gsl
               fftw
               fftwFloat
-              hdf5
+              hdf5_1_10
             ];
             configurePhase = ''
               ./configure --disable-swig --prefix=$out CFLAGS="-Wno-macro-redefined -flto -fuse-ld=lld" LDFLAGS="-flto -fuse-ld=lld"
@@ -39,8 +39,13 @@
               url = "https://software.igwn.org/lscsoft/source/lalsuite/lalsimulation-${version}.tar.xz";
               hash = "sha256-tsF4HoETQQiEXzjjpmljrmYcKpFdQTzxTmiZWIjcwKU=";
             };
-            nativeBuildInputs = with pkgs; [autoreconfHook pkg-config lld];
+            nativeBuildInputs = with pkgs; [pkg-config lld];
             buildInputs = with pkgs; [
+              zlib
+              gsl
+              fftw
+              fftwFloat
+              hdf5_1_10
               lalDeriv
             ];
             configurePhase = ''
@@ -56,3 +61,5 @@
         };
       });
 }
+
+#autoreconfHook
