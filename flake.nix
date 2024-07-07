@@ -8,14 +8,11 @@
     with inputs;
       flake-utils.lib.eachDefaultSystem (system: let
         # Setup nixpkgs
-        pkgs = import nixpkgs {
-          inherit system;
-          config.allowUnfree = true;
-        };
-        # Build LALSuite
-        lalsuiteDeriv = with pkgs;
+        pkgs = import nixpkgs {inherit system;};
+
+        lalDeriv = with pkgs;
           clangStdenv.mkDerivation rec {
-            pname = "lalsuite";
+            pname = "lal";
             version = "7.5.0";
             src = fetchurl {
               url = "https://software.igwn.org/lscsoft/source/lalsuite/lal-${version}.tar.xz";
@@ -27,15 +24,35 @@
               gsl
               fftw
               fftwFloat
+              hdf5
             ];
             configurePhase = ''
               ./configure --disable-swig --prefix=$out CFLAGS="-Wno-macro-redefined -flto -fuse-ld=lld" LDFLAGS="-flto -fuse-ld=lld"
             '';
           };
+
+        lalsimulationDeriv = with pkgs;
+          clangStdenv.mkDerivation rec {
+            pname = "lalsimulation";
+            version = "5.4.0";
+            src = fetchurl {
+              url = "https://software.igwn.org/lscsoft/source/lalsuite/lalsimulation-${version}.tar.xz";
+              hash = "sha256-tsF4HoETQQiEXzjjpmljrmYcKpFdQTzxTmiZWIjcwKU=";
+            };
+            nativeBuildInputs = with pkgs; [autoreconfHook pkg-config lld];
+            buildInputs = with pkgs; [
+              lalDeriv
+            ];
+            configurePhase = ''
+              ./configure --disable-swig --prefix=$out CFLAGS="-Wno-macro-redefined -flto -fuse-ld=lld" LDFLAGS="-flto -fuse-ld=lld"
+            '';
+          };
+
       in {
         packages = {
-          default = lalsuiteDeriv;
-          lalsuite = lalsuiteDeriv;
+          default = lalsimulationDeriv;
+          lal = lalDeriv;
+          lalsimulation = lalsimulationDeriv;
         };
       });
 }
